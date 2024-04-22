@@ -6,7 +6,20 @@
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <IsAotCompatible>true</IsAotCompatible>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>NativeFileDialogNET</Title>
+        <Description>C# Bindings for nativefiledialog-extended</Description>
+        <PackageProjectUrl>https://github.com/byte-0x74/NativeFiledialogNET</PackageProjectUrl>
+        <PackageLicenseUrl>https://raw.githubusercontent.com/byte-0x74/NativeFiledialogNET/master/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/byte-0x74/NativeFiledialogNET</RepositoryUrl>
+        <PackageTags>filedialog, nativefiledialog</PackageTags>
+        <PackageReleaseNotes>added native runtime dll for windows x64</PackageReleaseNotes>
+        <Version>1.0.1</Version>
     </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="runtimes\**" PackagePath="runtimes" />
+    </ItemGroup>
 
     <ItemGroup>
       <Folder Include="GeneratedCode\" />
@@ -17,8 +30,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="nfd.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <None Update="runtimes\win-x64\native\nfd.dll">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 
