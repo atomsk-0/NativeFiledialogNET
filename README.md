@@ -10,7 +10,7 @@ Here is a simple example of how to use the library:
 using NativeFileDialogNET;
 
 // Create a new instance of the dialog
-var dialog = new NativeFileDialog();
+using var dialog = new NativeFileDialog();
 
 // Open a file dialog
 DialogResult result = dialog.OpenDialog(out string output);
