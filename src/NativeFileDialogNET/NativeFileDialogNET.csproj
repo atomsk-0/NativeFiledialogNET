@@ -13,8 +13,8 @@
         <PackageLicenseUrl>https://raw.githubusercontent.com/byte-0x74/NativeFiledialogNET/master/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/byte-0x74/NativeFiledialogNET</RepositoryUrl>
         <PackageTags>filedialog, nativefiledialog</PackageTags>
-        <PackageReleaseNotes>added native runtime dll for windows x64</PackageReleaseNotes>
-        <Version>1.0.1</Version>
+        <PackageReleaseNotes>Added scoped methods (OpenSelectDialog, OpenSaveDialog)</PackageReleaseNotes>
+        <Version>1.0.2</Version>
     </PropertyGroup>
 
     <ItemGroup>
