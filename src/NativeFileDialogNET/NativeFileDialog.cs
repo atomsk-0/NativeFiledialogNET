@@ -1,221 +1,160 @@
-﻿using static NativeFileDialogNET.nfd;
-using __IntPtr = System.IntPtr;
+﻿using System.Runtime.InteropServices;
 
 namespace NativeFileDialogNET;
 
 public unsafe class NativeFileDialog : IDisposable
 {
+    private bool initialized;
+
+    private DialogMode dialogMode;
+    private readonly List<FilterItem> filterItems = [];
+
     public NativeFileDialog()
     {
-        NFD_Init();
+        if (Bindings.Init() == NfdResult.Okay)
+        {
+            initialized = true;
+        }
     }
-    
-    /// <summary>
-    /// Opens a save dialog with specified filters, default path and default name.
-    /// </summary>
-    /// <param name="output">The output path selected by the user.</param>
-    /// <param name="filters">The filters for the dialog.</param>
-    /// <param name="defaultPath">The default path for the dialog.</param>
-    /// <param name="defaultName">The default name for the file.</param>
-    /// <returns>The result of the dialog operation.</returns>
-    public DialogResult OpenSaveDialog(out string output, FilterItem[] filters, string defaultPath, string defaultName)
+
+    public DialogResult Open(out string? output, string? defaultPath = null, string? defaultName = null)
     {
-        char* outputPtr;
-        NfdresultT result;
-        var filtersNative = ConvertToNativeFilters(filters);
-
-        fixed (FilterItemNative* filtersPtr = filtersNative)
+        output = null;
+        if (initialized == false) throw new InvalidOperationException("NativeFileDialog is not initialized.");
+        switch (dialogMode)
         {
-            result = __Internal.NFD_SaveDialogN(&outputPtr, (__IntPtr)filtersPtr, (uint)filters.Length, defaultPath, defaultName);
+            case DialogMode.SelectFile:
+            {
+                NfdResult result;
+                NfdU8FilterItem[] nativeFilterItems = Util.ConvertFilterItemsToNative(CollectionsMarshal.AsSpan(filterItems));
+                sbyte* selectedPath = null;
+                fixed(NfdU8FilterItem* filterItemsPtr = nativeFilterItems)
+                {
+                    sbyte* defaultPathPtr = Util.ConvertStringToPointer(defaultPath);
+                    result = Bindings.OpenDialog(&selectedPath, filterItemsPtr, (uint)nativeFilterItems.Length, defaultPathPtr);
+                    if (result == NfdResult.Okay)
+                    {
+                        output = Marshal.PtrToStringUTF8((IntPtr)selectedPath);
+                        Bindings.FreePath(selectedPath);
+                    }
+                    Util.FreeStringPointer(defaultPathPtr);
+                }
+                foreach (var item in nativeFilterItems)
+                {
+                    Util.FreeStringPointer(item.Name);
+                    Util.FreeStringPointer(item.Spec);
+                }
+                return result switch
+                {
+                    NfdResult.Okay => DialogResult.Okay,
+                    NfdResult.Cancel => DialogResult.Cancel,
+                    _ => DialogResult.Error,
+                };
+            }
+            case DialogMode.SelectFolder:
+            {
+                sbyte* selectedPath = null;
+                sbyte* defaultPathPtr = Util.ConvertStringToPointer(defaultPath);
+                NfdResult result = Bindings.PickFolder(&selectedPath, defaultPathPtr);
+                if (result == NfdResult.Okay)
+                {
+                    output = Marshal.PtrToStringUTF8((IntPtr)selectedPath);
+                    Bindings.FreePath(selectedPath);
+                }
+                Util.FreeStringPointer(defaultPathPtr);
+                break;
+            }
+            case DialogMode.SaveFile:
+            {
+                NfdResult result;
+                NfdU8FilterItem[] nativeFilterItems = Util.ConvertFilterItemsToNative(CollectionsMarshal.AsSpan(filterItems));
+                sbyte* selectedPath = null;
+                fixed(NfdU8FilterItem* filterItemsPtr = nativeFilterItems)
+                {
+                    sbyte* defaultPathPtr = Util.ConvertStringToPointer(defaultPath);
+                    sbyte* defaultNamePtr = Util.ConvertStringToPointer(defaultName);
+                    result = Bindings.SaveDialog(&selectedPath, filterItemsPtr, (uint)nativeFilterItems.Length, defaultPathPtr, defaultNamePtr);
+                    if (result == NfdResult.Okay)
+                    {
+                        output = Marshal.PtrToStringUTF8((IntPtr)selectedPath);
+                        Bindings.FreePath(selectedPath);
+                    }
+                    Util.FreeStringPointer(defaultPathPtr);
+                    Util.FreeStringPointer(defaultNamePtr);
+                }
+                foreach (var item in nativeFilterItems)
+                {
+                    Util.FreeStringPointer(item.Name);
+                    Util.FreeStringPointer(item.Spec);
+                }
+                return result switch
+                {
+                    NfdResult.Okay => DialogResult.Okay,
+                    NfdResult.Cancel => DialogResult.Cancel,
+                    _ => DialogResult.Error,
+                };
+            }
         }
-        
-        output = new string(outputPtr);
-        if (result == NfdresultT.NFD_OKAY)
-        {
-            NFD_FreePathN(outputPtr);
-        }
-        return (DialogResult)result;
+        return DialogResult.Error;
     }
 
-    /// <summary>
-    /// Opens a save dialog with a specified default path and name.
-    /// </summary>
-    /// <param name="output">The output path selected by the user.</param>
-    /// <param name="defaultPath">The default path for the dialog.</param>
-    /// <param name="defaultName">The default name for the file.</param>
-    /// <returns>The result of the dialog operation.</returns>
-    public DialogResult OpenSaveDialog(out string output, string defaultPath, string defaultName)
+    public NativeFileDialog SaveFile()
     {
-        char* outputPtr;
-        var result = NFD_SaveDialogN(&outputPtr, null, 0, defaultPath, defaultName);
-        output = new string(outputPtr);
-        if (result == NfdresultT.NFD_OKAY)
-        {
-            NFD_FreePathN(outputPtr);
-        }
-        return (DialogResult)result;
+        dialogMode = DialogMode.SaveFile;
+        filterItems.Clear();
+        return this;
     }
-    
-    
-    /// <summary>
-    /// Opens a save dialog with a specified default name.
-    /// </summary>
-    /// <param name="output">The output path selected by the user.</param>
-    /// <param name="defaultName">The default name for the file.</param>
-    /// <returns>The result of the dialog operation.</returns>
-    public DialogResult OpenSaveDialog(out string output, string defaultName)
+
+    public NativeFileDialog SelectFile()
     {
-        char* outputPtr;
-        var result = NFD_SaveDialogN(&outputPtr, null, 0, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), defaultName);
-        output = new string(outputPtr);
-        if (result == NfdresultT.NFD_OKAY)
-        {
-            NFD_FreePathN(outputPtr);
-        }
-        return (DialogResult)result;
+        dialogMode = DialogMode.SelectFile;
+        filterItems.Clear();
+        return this;
     }
-    
-    
-    /// <summary>
-    /// Opens a save dialog.
-    /// </summary>
-    /// <param name="output">The output path selected by the user.</param>
-    /// <returns>The result of the dialog operation.</returns>
-    public DialogResult OpenSaveDialog(out string output)
+
+    public NativeFileDialog SelectFolder()
     {
-        char* outputPtr;
-        var result = NFD_SaveDialogN(&outputPtr, null, 0, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "");
-        output = new string(outputPtr);
-        if (result == NfdresultT.NFD_OKAY)
-        {
-            NFD_FreePathN(outputPtr);
-        }
-        return (DialogResult)result;
+        dialogMode = DialogMode.SelectFolder;
+        filterItems.Clear();
+        return this;
     }
 
-    /// <summary>
-    /// Opens a select dialog.
-    /// </summary>
-    /// <param name="output">The output path selected by the user.</param>
-    /// <returns>The result of the dialog operation.</returns>
-    public DialogResult OpenSelectDialog(out string output)
+    public NativeFileDialog AddFilter(string name, string spec)
     {
-        char* outputPtr;
-
-        var result = NFD_OpenDialogN(&outputPtr, null, 0, null);
-        output = new string(outputPtr);
-        if (result == NfdresultT.NFD_OKAY)
-        {
-            NFD_FreePathN(outputPtr);
-        }
-        return (DialogResult)result;
-    }
-    
-    /// <summary>
-    /// Opens a select dialog with specified filters and a default path.
-    /// </summary>
-    /// <param name="output">The output path selected by the user.</param>
-    /// <param name="filters">The filters for the dialog.</param>
-    /// <param name="defaultPath">The default path for the dialog.</param>
-    /// <returns>The result of the dialog operation.</returns>
-    public DialogResult OpenSelectDialog(out string output, FilterItem[] filters, string? defaultPath = null)
-    {
-        char* outputPtr;
-        NfdresultT result;
-
-        var filtersNative = ConvertToNativeFilters(filters);
-
-        fixed (FilterItemNative* filtersPtr = filtersNative)
-        {
-            result = __Internal.NFD_OpenDialogN(&outputPtr, (__IntPtr)filtersPtr, (uint)filters.Length, defaultPath);
-        }
-
-        output = new string(outputPtr);
-
-        if (result == NfdresultT.NFD_OKAY)
-        {
-            NFD_FreePathN(outputPtr);
-        }
-
-        return (DialogResult)result;
+        filterItems.Add(new FilterItem(name, spec));
+        return this;
     }
 
-
-    /// <summary>
-    /// Opens a select dialog.
-    /// </summary>
-    /// <param name="output">The output path selected by the user.</param>
-    /// <returns>The result of the dialog operation.</returns>
-    [Obsolete("Use scoped methods instead (OpenSelectDialog, OpenSaveDialog)")]
-    public DialogResult OpenDialog(out string output)
-    {
-        char* outputPtr;
-
-        var result = NFD_OpenDialogN(&outputPtr, null, 0, null);
-        output = new string(outputPtr);
-        if (result == NfdresultT.NFD_OKAY)
-        {
-            NFD_FreePathN(outputPtr);
-        }
-        return (DialogResult)result;
-    }
-    
-    /// <summary>
-    /// Opens a select dialog with specified filters and a default path.
-    /// </summary>
-    /// <param name="output">The output path selected by the user.</param>
-    /// <param name="filters">The filters for the dialog.</param>
-    /// <param name="defaultPath">The default path for the dialog.</param>
-    /// <returns>The result of the dialog operation.</returns>
-    [Obsolete("Use scoped methods instead (OpenSelectDialog, OpenSaveDialog)")]
-    public DialogResult OpenDialog(out string output, FilterItem[] filters, string? defaultPath = null)
-    {
-        char* outputPtr;
-        NfdresultT result;
-
-        var filtersNative = ConvertToNativeFilters(filters);
-
-        fixed (FilterItemNative* filtersPtr = filtersNative)
-        {
-            result = __Internal.NFD_OpenDialogN(&outputPtr, (__IntPtr)filtersPtr, (uint)filters.Length, defaultPath);
-        }
-
-        output = new string(outputPtr);
-
-        if (result == NfdresultT.NFD_OKAY)
-        {
-            NFD_FreePathN(outputPtr);
-        }
-
-        return (DialogResult)result;
-    }
-
-    private FilterItemNative[] ConvertToNativeFilters(FilterItem[] filters)
-    {
-        var filtersNative = new FilterItemNative[filters.Length];
-
-        for (int i = 0; i < filters.Length; i++)
-        {
-            filtersNative[i].Name = GetPointerFromString(filters[i].Name);
-            filtersNative[i].Spec = GetPointerFromString(filters[i].Spec);
-        }
-        
-        return filtersNative;
-    }
-
-    private char* GetPointerFromString(string str)
-    {
-        fixed (char* ptr = str)
-        {
-            return ptr;
-        }
-    }
-    
     public void Dispose()
     {
-        NFD_Quit();
+        if (initialized)
+        {
+            Bindings.Quit();
+            initialized = false;
+        }
+        filterItems.Clear();
         GC.SuppressFinalize(this);
     }
 
     ~NativeFileDialog() => Dispose();
+}
+
+public readonly struct FilterItem(string name, string spec)
+{
+    public readonly string Name = name;
+    public readonly string Spec = spec;
+}
+
+public enum DialogResult
+{
+    Error,
+    Okay,
+    Cancel,
+}
+
+internal enum DialogMode
+{
+    SelectFile,
+    SelectFolder,
+    SaveFile,
 }

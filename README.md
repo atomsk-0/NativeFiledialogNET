@@ -9,42 +9,27 @@ Here is a simple example of how to use the library:
 ```csharp
 using NativeFileDialogNET;
 
-// Create a new instance of the dialog
-using var dialog = new NativeFileDialog();
+using var selectFileDialog = new NativeFileDialog()
+    .SelectFile()
+    .AddFilter("Text Files", "*.txt") // Optionally add filters
+    .AddFilter("All Files", "*.*");  // Optionally add filters
 
-// Open a select file dialog
-var selectResult = dialog.OpenSelectDialog(out string selectOutput, [new FilterItem { Name = "Text files", Spec = "txt" }]);
+DialogResult result = selectFileDialog.Open(out string? output, Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+Console.WriteLine(result == DialogResult.Okay ? $"Selected file: {output}" : "User canceled the dialog.");
 
-// Check the result
-switch (selectResult)
-{
-    case DialogResult.Okay:
-        Console.WriteLine($"Selected file: {selectOutput}");
-        break;
-    case DialogResult.Cancel:
-        Console.WriteLine("User cancelled the dialog");
-        break;
-    default:
-        Console.WriteLine("An error occurred");
-        break;
-}
+using var selectFolderDialog = new NativeFileDialog()
+    .SelectFolder();
 
-// Open a save file dialog
-var saveResult = dialog.OpenSaveDialog(out string saveOutput, [new FilterItem { Name = "Text files", Spec = "txt" }], Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "test.txt");
+result = selectFolderDialog.Open(out string? folder,  Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+Console.WriteLine(result == DialogResult.Okay ? $"Selected folder: {folder}" : "User canceled the dialog.");
 
-// Check the result
-switch (saveResult)
-{
-    case DialogResult.Okay:
-        Console.WriteLine($"Saved file path: {saveOutput}");
-        break;
-    case DialogResult.Cancel:
-        Console.WriteLine("User cancelled the dialog");
-        break;
-    default:
-        Console.WriteLine("An error occurred");
-        break;
-}
+using var saveFileDialog = new NativeFileDialog()
+    .SaveFile()
+    .AddFilter("Text Files", "*.txt")  // Optionally add filters
+    .AddFilter("All Files", "*.*");  // Optionally add filters
+
+result = saveFileDialog.Open(out string? saveFile, Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DefaultName.txt");
+Console.WriteLine(result == DialogResult.Okay ? $"Selected file: {saveFile}" : "User canceled the dialog.");
 ```
 
 Contributions are welcome! Please feel free to submit a pull request.

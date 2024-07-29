@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net7.0;net8.0;net9.0</TargetFrameworks>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -13,26 +13,12 @@
         <PackageLicenseUrl>https://raw.githubusercontent.com/byte-0x74/NativeFiledialogNET/master/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/byte-0x74/NativeFiledialogNET</RepositoryUrl>
         <PackageTags>filedialog, nativefiledialog</PackageTags>
-        <PackageReleaseNotes>Added scoped methods (OpenSelectDialog, OpenSaveDialog)</PackageReleaseNotes>
-        <Version>1.0.2</Version>
+        <PackageReleaseNotes>Whole project rewrite check BasicUsage from samples to see how new bindings work, now only supports .NET 8 or higher</PackageReleaseNotes>
+        <Version>2.0.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
         <Content Include="runtimes\**" PackagePath="runtimes" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="GeneratedCode\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="CppSharp.Runtime" Version="1.1.5.3168" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="runtimes\win-x64\native\nfd.dll">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
 </Project>
