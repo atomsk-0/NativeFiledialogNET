@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PublishAot>true</PublishAot>
+        <StaticExecutable>true</StaticExecutable>
+    </PropertyGroup>
+
+    <!-- Add the following ItemGroup to include the native library and linker arguments -->
+    <ItemGroup>
+        <DirectPInvoke Include="nfd" Visible="false"/>
+        <NativeLibrary Include ="nfd.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" Visible="false"/>
+
+        <!-- Windows build of nfd depends on this lib too -->
+        <LinkerArg Include="Shell32.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <!-- Fix warning warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library -->
+        <LinkerArg Include="/NODEFAULTLIB:MSVCRT" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        
+        <!-- Add the following LinkerArg to include the native library path unless lib is in same directory as csproj -->
+        <LinkerArg Include="/LIBPATH:..\\..\\vendor\\nativefiledialog-extended\build\src\Release" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\NativeFileDialogNET\NativeFileDialogNET.csproj" />
+    </ItemGroup>
+
+</Project>

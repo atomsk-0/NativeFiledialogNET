@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeFileDialogNET", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicUsage", "samples\BasicUsage\BasicUsage.csproj", "{B558563F-FDCA-4CFC-BA3E-D40958AC62B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AotStaticLink", "samples\AotStaticLink\AotStaticLink.csproj", "{2E7FB140-05B0-4DD6-B802-6BC1459BF3A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -16,6 +18,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{405B6FA8-13E8-40E7-830A-9150FEDCF837} = {809B689F-FF4C-44F8-9AEC-327CF0ACB074}
 		{B558563F-FDCA-4CFC-BA3E-D40958AC62B5} = {4928006B-9D08-4AEC-A15D-F6D904937B07}
+		{2E7FB140-05B0-4DD6-B802-6BC1459BF3A1} = {4928006B-9D08-4AEC-A15D-F6D904937B07}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{405B6FA8-13E8-40E7-830A-9150FEDCF837}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -26,5 +29,9 @@ Global
 		{B558563F-FDCA-4CFC-BA3E-D40958AC62B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B558563F-FDCA-4CFC-BA3E-D40958AC62B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B558563F-FDCA-4CFC-BA3E-D40958AC62B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E7FB140-05B0-4DD6-B802-6BC1459BF3A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E7FB140-05B0-4DD6-B802-6BC1459BF3A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E7FB140-05B0-4DD6-B802-6BC1459BF3A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E7FB140-05B0-4DD6-B802-6BC1459BF3A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
