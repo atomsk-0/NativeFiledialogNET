@@ -44,12 +44,7 @@ public unsafe class NativeFileDialog : IDisposable
                     Util.FreeStringPointer(item.Name);
                     Util.FreeStringPointer(item.Spec);
                 }
-                return result switch
-                {
-                    NfdResult.Okay => DialogResult.Okay,
-                    NfdResult.Cancel => DialogResult.Cancel,
-                    _ => DialogResult.Error,
-                };
+                return MapResult(result);
             }
             case DialogMode.SelectFolder:
             {
@@ -62,7 +57,7 @@ public unsafe class NativeFileDialog : IDisposable
                     Bindings.FreePath(selectedPath);
                 }
                 Util.FreeStringPointer(defaultPathPtr);
-                break;
+                return MapResult(result);
             }
             case DialogMode.SaveFile:
             {
@@ -87,15 +82,18 @@ public unsafe class NativeFileDialog : IDisposable
                     Util.FreeStringPointer(item.Name);
                     Util.FreeStringPointer(item.Spec);
                 }
-                return result switch
-                {
-                    NfdResult.Okay => DialogResult.Okay,
-                    NfdResult.Cancel => DialogResult.Cancel,
-                    _ => DialogResult.Error,
-                };
+                return MapResult(result);
             }
         }
         return DialogResult.Error;
+
+        static DialogResult MapResult(NfdResult result)
+            => result switch
+            {
+                NfdResult.Okay => DialogResult.Okay,
+                NfdResult.Cancel => DialogResult.Cancel,
+                _ => DialogResult.Error,
+            };
     }
 
     public NativeFileDialog SaveFile()
