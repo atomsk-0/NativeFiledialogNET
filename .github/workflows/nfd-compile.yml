@@ -68,8 +68,8 @@ jobs:
       - name: Build nfd
         run: |
           cmake --build nativefiledialog-extended/build --config Release
-          echo "Contents of build directory:"
-          ls -R nativefiledialog-extended/build
+          echo "Shared libraries built:"
+          find nativefiledialog-extended/build -type f \( -name "*.dll" -o -name "*.so" -o -name "*.dylib" \)
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4.3.4
