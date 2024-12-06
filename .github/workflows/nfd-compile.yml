@@ -65,18 +65,29 @@ jobs:
           cd build
           cmake -A ${{ matrix.cmake-arch }} -DNFD_BUILD_TESTS=OFF -DNFD_INSTALL=OFF -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=${{ matrix.cmake-arch }} ..
 
-      - name: Build nfd
+      - name: MSVC Build
+        if: matrix.os == 'windows-latest'
         run: |
           cmake --build nativefiledialog-extended/build --config Release
+          
+      - name: GCC/CLANG Build
+        if: matrix.os != 'windows-latest'
+        run: |
+          cmake --build nativefiledialog-extended/build
           echo "Shared libraries built:"
-          find nativefiledialog-extended/build -type f \( -name "*.dll" -o -name "*.so" -o -name "*.dylib" \)
+          find nativefiledialog-extended -type f \( -name "*.dll" -o -name "*.so" -o -name "*.dylib" \)
+          
+      - name: Move Windows binaries
+        if: matrix.os == 'windows-latest'
+        run: |
+          mv nativefiledialog-extended/build/src/Release/*.dll nativefiledialog-extended/build/src/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4.3.4
         with:
           name: nfd-${{ matrix.os }}-${{ matrix.arch }}-artifacts
           path: |
-            nativefiledialog-extended/build/src/Release/*.dll
-            nativefiledialog-extended/build/src/Release/*.so
-            nativefiledialog-extended/build/src/Release/*.dylib
+            nativefiledialog-extended/build/src/*.dll
+            nativefiledialog-extended/build/src/*.so
+            nativefiledialog-extended/build/src/*.dylib
           if-no-files-found: warn # 'warn' or 'ignore' or 'error'
