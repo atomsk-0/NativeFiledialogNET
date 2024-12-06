@@ -47,7 +47,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake
+          sudo apt-get install -y build-essential cmake libgtk-3-dev
 
       - name: Install Cross-Compilation Tools for ARM64
         if: matrix.os == 'ubuntu-latest' && matrix.arch == 'arm64'
