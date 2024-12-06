@@ -12,10 +12,6 @@ jobs:
             arch: x86_64
             cmake-arch: x64
             vcpkg-triplet: x64-linux
-          - os: ubuntu-latest
-            arch: arm64
-            cmake-arch: aarch64
-            vcpkg-triplet: arm64-linux
           - os: windows-latest
             arch: x86_64
             cmake-arch: x64
@@ -24,10 +20,6 @@ jobs:
             arch: x86
             cmake-arch: win32
             vcpkg-triplet: x86-windows-static
-          - os: windows-latest
-            arch: arm64
-            cmake-arch: arm64
-            vcpkg-triplet: arm64-windows-static
           - os: macos-latest
             arch: x86_64
             cmake-arch: x86_64
@@ -48,19 +40,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake libgtk-3-dev
-
-      - name: Install Cross-Compilation Tools for ARM64
-        if: matrix.os == 'ubuntu-latest' && matrix.arch == 'arm64'
-        run: |
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-
-      - name: Configure nfd with CMake for ARM64 on Linux
-        if: matrix.os == 'ubuntu-latest' && matrix.arch == 'arm64'
-        run: |
-          cd nativefiledialog-extended
-          mkdir build
-          cd build
-          cmake -DNFD_BUILD_TESTS=OFF -DNFD_INSTALL=OFF -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ ..
 
       - name: Configure nfd with CMake on Linux (x86_64)
         if: matrix.os == 'ubuntu-latest' && matrix.arch == 'x86_64'
@@ -87,7 +66,10 @@ jobs:
           cmake -A ${{ matrix.cmake-arch }} -DNFD_BUILD_TESTS=OFF -DNFD_INSTALL=OFF -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=${{ matrix.cmake-arch }} ..
 
       - name: Build nfd
-        run: cmake --build nativefiledialog-extended/build --config Release
+        run: |
+          cmake --build nativefiledialog-extended/build --config Release
+          echo "Contents of build directory:"
+          ls -R nativefiledialog-extended/build
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4.3.4
