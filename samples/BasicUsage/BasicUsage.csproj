@@ -20,14 +20,14 @@
                 And $([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture) == 'X86'">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-        <Content Include="..\..\src\NativeFiledialogNET\runtimes\linux-x64\native\libnfd.so" Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+        <Content Include="..\..\src\NativeFiledialogNET\runtimes\linux-x64\native\nfd.so" Condition="$([MSBuild]::IsOSPlatform('Linux'))">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-        <Content Include="..\..\src\NativeFiledialogNET\runtimes\osx-x64\native\libnfd.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX'))
+        <Content Include="..\..\src\NativeFiledialogNET\runtimes\osx-x64\native\nfd.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX'))
                 And $([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture) == 'X64'">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-        <Content Include="..\..\src\NativeFiledialogNET\runtimes\osx-arm64\native\libnfd.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX'))
+        <Content Include="..\..\src\NativeFiledialogNET\runtimes\osx-arm64\native\nfd.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX'))
                 And $([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture) == 'Arm64'">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
