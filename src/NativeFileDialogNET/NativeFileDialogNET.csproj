@@ -13,8 +13,8 @@
         <PackageLicenseUrl>https://raw.githubusercontent.com/byte-0x74/NativeFiledialogNET/master/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/byte-0x74/NativeFiledialogNET</RepositoryUrl>
         <PackageTags>filedialog, nativefiledialog</PackageTags>
-        <PackageReleaseNotes>Whole project rewrite check BasicUsage from samples to see how new bindings work, now only supports .NET 8 or higher</PackageReleaseNotes>
-        <Version>2.0.0</Version>
+        <PackageReleaseNotes>Added linux, macos runtimes and added "AllowMultiple" function to be used to allow users select multiple folders/files see BasicUsage project for more info</PackageReleaseNotes>
+        <Version>2.0.2</Version>
     </PropertyGroup>
 
     <ItemGroup>
